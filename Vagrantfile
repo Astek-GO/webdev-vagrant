@@ -45,7 +45,6 @@ require 'ipaddr'
 crc = Zlib::crc32(project)
 ip = (crc & 0x00ffffff) | (10 << 24)
 ip = IPAddr.new(ip, Socket::AF_INET).to_s
-$port_base = (crc % 500) * 100 + 3000
 
 # Colorize custom output
 class String
@@ -160,12 +159,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Stuff can be done after puppet.
   config.vm.provision :shell, :path => 'vagrant/post-puppet.sh', :args => project
 
-  config.vm.network :forwarded_port, guest: 80,   host: $port_base + 80
-  config.vm.network :forwarded_port, guest: 3306, host: $port_base + 6
+  config.vm.network :forwarded_port, guest: 80,   host: 8080
+  config.vm.network :forwarded_port, guest: 3306, host: 33060
 
   config.trigger.after [:up, :resume, :status, :restart] do
     $banner = "==> ".bold + "Squishy".cyan.bold + "Media".green.bold + " VAGRANT for " + (project).to_s.yellow.bold
-    $link = "http://" + project.to_s + ".local:" + ($port_base + 80).to_s + "/"
+    $link = "http://" + project.to_s + ".local:" + (8080).to_s + "/"
     puts
     puts $banner
     puts $link.underline
